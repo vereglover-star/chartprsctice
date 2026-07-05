@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Chart School Complete Trading Course</title>
+<style>
+:root{
+  --bg:#090d0b; --panel:#121714; --panel2:#19211d; --panel3:#202a25;
+  --text:#eef4ef; --muted:#9aa79d; --line:#2a352f;
+  --gold:#f4b942; --green:#39d98a; --red:#f15b6c; --blue:#62b6ff; --violet:#b88cff;
+  --gold2:rgba(244,185,66,.14); --green2:rgba(57,217,138,.13); --red2:rgba(241,91,108,.13); --blue2:rgba(98,182,255,.12);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.55}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.48;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.app{min-height:100vh;display:grid;grid-template-columns:290px 1fr}
+.sidebar{position:sticky;top:0;height:100vh;overflow:auto;background:#0d120f;border-right:1px solid var(--line);padding:18px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.01em;margin-bottom:16px}
+.mark{display:grid;grid-template-columns:repeat(3,6px);gap:3px;align-items:end;height:22px}
+.mark span{display:block;width:6px;border-radius:2px;background:var(--gold)}
+.mark span:nth-child(1){height:12px;background:var(--green)}.mark span:nth-child(2){height:18px;background:var(--red)}.mark span:nth-child(3){height:22px;background:var(--gold)}
+.statbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:14px}
+.statrow{display:flex;justify-content:space-between;gap:12px;font-size:.84rem;color:var(--muted);margin:5px 0}
+.statrow b{color:var(--text);font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.bar{height:7px;background:var(--panel3);border-radius:99px;overflow:hidden;margin-top:10px}
+.bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--green));width:0%}
+.nav{display:flex;flex-direction:column;gap:6px}
+.nav button{width:100%;display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;text-align:left;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted);padding:9px}
+.nav button:hover{background:var(--panel);color:var(--text)}
+.nav button.active{background:var(--gold2);border-color:rgba(244,185,66,.35);color:var(--text)}
+.nav .num{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--gold);font-size:.78rem}
+.nav .lock{font-size:.7rem;text-transform:uppercase;color:var(--muted)}
+.nav button.locked{opacity:.52}
+.main{padding:24px clamp(18px,4vw,52px) 70px;max-width:1180px;width:100%}
+.topline{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:22px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:99px;padding:7px 11px;color:var(--muted);font-size:.82rem}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:9px 12px;font-weight:700;font-size:.88rem}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:var(--gold);color:#171105;border-color:var(--gold)}
+.btn.good{background:var(--green2);border-color:rgba(57,217,138,.4);color:#baf7d4}
+.btn.bad{background:var(--red2);border-color:rgba(241,91,108,.4);color:#ffc2c9}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:18px;align-items:stretch;margin-bottom:18px}
+.heroText,.marketToy,.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:22px}
+.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;color:var(--gold);font-weight:800}
+h1{font-size:clamp(1.8rem,3.2vw,3rem);line-height:1.05;margin:10px 0 12px;letter-spacing:0}
+h2{font-size:1.12rem;margin:0 0 12px} h3{font-size:.98rem;margin:16px 0 8px;color:#dfe8e1}
+p{margin:0 0 12px;color:#cdd7cf}.lead{font-size:1.03rem;color:#dce5df}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{margin-bottom:14px}.card.compact{padding:16px}
+.list{display:grid;gap:8px;margin:0;padding:0;list-style:none}.list li{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px;color:#d7dfd9}
+.mini{font-size:.84rem;color:var(--muted)}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.price{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:3.2rem;font-weight:800;color:var(--gold);margin:8px 0}
+.tape{height:54px;display:flex;align-items:end;gap:4px;border-bottom:1px solid var(--line);margin:14px 0}
+.tick{width:12px;background:var(--green);border-radius:2px 2px 0 0;min-height:8px}.tick.red{background:var(--red)}
+.feedback{border-radius:8px;padding:12px;margin-top:12px;border:1px solid var(--line);background:var(--panel2);color:#d8e0da}
+.feedback.good{background:var(--green2);border-color:rgba(57,217,138,.4)}.feedback.bad{background:var(--red2);border-color:rgba(241,91,108,.4)}.feedback.info{background:var(--blue2);border-color:rgba(98,182,255,.35)}
+pre.visual{white-space:pre-wrap;background:#0b100d;border:1px solid var(--line);border-radius:8px;padding:14px;color:#dce5df;overflow:auto}
+.quizOptions{display:grid;gap:9px}.option{width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:12px}
+.option.correct{background:var(--green2);border-color:var(--green)}.option.incorrect{background:var(--red2);border-color:var(--red)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:var(--panel2);border-radius:99px;padding:7px 10px;font-size:.82rem;color:#dce5df}
+.flashgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.flash{min-height:115px;perspective:700px}.flashInner{position:relative;height:100%;transition:transform .35s;transform-style:preserve-3d}.flash.flipped .flashInner{transform:rotateY(180deg)}
+.front,.back{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid var(--line);border-radius:8px;padding:12px;backface-visibility:hidden;background:var(--panel2)}
+.front{font-weight:800}.back{transform:rotateY(180deg);font-size:.84rem;color:#d5ded7}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:12px}.matchCol{display:grid;gap:8px}
+.matchItem{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:10px;text-align:left}.matchItem.selected{border-color:var(--gold);background:var(--gold2)}.matchItem.done{border-color:var(--green);background:var(--green2)}
+.field{display:grid;gap:6px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:#0d130f;color:var(--text);border-radius:8px;padding:10px}.field textarea{min-height:82px}
+.simGrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:14px}.chartBox{background:#0b100d;border:1px solid var(--line);border-radius:8px;padding:10px}.chartBox svg{width:100%;height:260px;display:block}
+.ledger{max-height:240px;overflow:auto;display:grid;gap:8px}.ledgerRow{border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:9px;font-size:.84rem}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{border-bottom:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}th{color:var(--gold)}
+.hide{display:none!important}
+.footerNote{color:var(--muted);font-size:.78rem;text-align:center;margin-top:26px}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}.hero,.grid,.grid.three,.simGrid{grid-template-columns:1fr}.main{padding:18px}.match{grid-template-columns:1fr}.price{font-size:2.4rem}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="mark"><span></span><span></span><span></span></span><span>Chart School</span></div>
+    <div class="statbox">
+      <div class="statrow"><span>Progress</span><b id="progressText">0%</b></div>
+      <div class="bar"><span id="progressBar"></span></div>
+      <div class="statrow"><span>Quiz average</span><b id="avgText">0%</b></div>
+      <div class="statrow"><span>Paper trades</span><b id="tradeText">0</b></div>
+      <div class="statrow"><span>Weak topic</span><b id="weakText">None</b></div>
+    </div>
+    <nav class="nav" id="levelNav"></nav>
+  </aside>
+
+  <main class="main">
+    <div class="topline">
+      <span class="pill" id="levelPill">Level 1 of 24</span>
+      <div class="actions">
+        <button class="btn" id="explainBtn">Explain differently</button>
+        <button class="btn" id="printBtn">Print</button>
+        <button class="btn bad" id="resetBtn">Reset progress</button>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="heroText">
+        <div class="eyebrow" id="eyebrow">Absolute Beginner</div>
+        <h1 id="title">Loading...</h1>
+        <p class="lead" id="objective"></p>
+        <div class="chips" id="topicChips"></div>
+      </div>
+      <div class="marketToy">
+        <div class="eyebrow">Interactive Price Tape</div>
+        <div class="price">$<span id="toyPrice">50.00</span></div>
+        <div class="actions">
+          <button class="btn good" id="buyPressure">Buyer pressure</button>
+          <button class="btn bad" id="sellPressure">Seller pressure</button>
+          <button class="btn" id="toyReset">Reset tape</button>
+        </div>
+        <div class="tape" id="tape"></div>
+        <p class="mini" id="toyHint">Price moves because aggressive buyers and sellers compete for liquidity.</p>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>1. Simple Explanation</h2>
+        <p id="simple"></p>
+      </article>
+      <article class="card">
+        <h2>2. Why It Matters</h2>
+        <p id="why"></p>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>3. How It Works</h2>
+        <ul class="list" id="howList"></ul>
+      </article>
+      <article class="card">
+        <h2>4. Example and Counterexample</h2>
+        <p><b>Example:</b> <span id="example"></span></p>
+        <p><b>Counterexample:</b> <span id="counter"></span></p>
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>Visual</h2>
+      <pre class="visual" id="visual"></pre>
+    </section>
+
+    <section class="card">
+      <h2>Historical Case Study</h2>
+      <p id="caseStudy"></p>
+      <p class="mini">For current market data, verify live before trading. This course uses historical examples for education.</p>
+    </section>
+
+    <section class="grid three">
+      <article class="card compact">
+        <h2>Common Mistakes</h2>
+        <ul class="list" id="mistakes"></ul>
+      </article>
+      <article class="card compact">
+        <h2>Cheat Sheet</h2>
+        <ul class="list" id="cheats"></ul>
+      </article>
+      <article class="card compact">
+        <h2>Formula Sheet</h2>
+        <ul class="list" id="formulas"></ul>
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>Adaptive Tutor</h2>
+      <p>If something feels foggy, click a style below. The course will restate the same idea from another angle.</p>
+      <div class="actions">
+        <button class="btn tutor" data-style="ten">Like I am 10</button>
+        <button class="btn tutor" data-style="sports">Sports analogy</button>
+        <button class="btn tutor" data-style="game">Video game analogy</button>
+        <button class="btn tutor" data-style="steps">Step by step</button>
+      </div>
+      <div class="feedback info" id="tutorBox">Pick an explanation style whenever you are confused.</div>
+    </section>
+
+    <section class="card">
+      <h2>Vocabulary Flashcards</h2>
+      <div class="flashgrid" id="flashcards"></div>
+    </section>
+
+    <section class="card">
+      <h2>Matching Exercise</h2>
+      <p class="mini">Click a term, then click the matching definition.</p>
+      <div class="match" id="matchArea"></div>
+      <div class="feedback" id="matchFeedback">Match all pairs to strengthen vocabulary.</div>
+    </section>
+
+    <section class="card">
+      <h2>Checkpoint Quiz</h2>
+      <p class="mini">Score at least 80% to unlock the next level. Wrong answers explain why each choice is right or wrong.</p>
+      <div id="quizArea"></div>
+    </section>
+
+    <section class="card">
+      <h2>Practice Assignment</h2>
+      <p id="assignment"></p>
+      <div class="field">
+        <label for="assignmentNotes">Your notes</label>
+        <textarea id="assignmentNotes" placeholder="Write your answer or observation here. It saves locally in this browser."></textarea>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button class="btn primary" id="saveNotes">Save notes</button>
+      </div>
+      <div class="feedback hide" id="notesSaved">Saved.</div>
+    </section>
+
+    <section class="card">
+      <h2>Paper Trading Simulator</h2>
+      <div class="simGrid">
+        <div>
+          <div class="chartBox"><svg id="simChart" viewBox="0 0 620 260" role="img" aria-label="Simulated price chart"></svg></div>
+          <div class="actions" style="margin-top:10px">
+            <button class="btn" id="newScenario">New scenario</button>
+            <button class="btn good" id="takeLong">Take long</button>
+            <button class="btn bad" id="takeShort">Take short</button>
+            <button class="btn" id="skipTrade">Skip</button>
+          </div>
+        </div>
+        <div>
+          <p id="scenarioText"></p>
+          <div class="grid" style="grid-template-columns:1fr 1fr">
+            <label class="field">Entry<input id="entryInput" type="number" step="0.01"></label>
+            <label class="field">Stop<input id="stopInput" type="number" step="0.01"></label>
+            <label class="field">Target<input id="targetInput" type="number" step="0.01"></label>
+            <label class="field">Risk $<input id="riskInput" type="number" step="1" value="100"></label>
+          </div>
+          <div class="feedback" id="simFeedback">Use the chart to plan entry, stop, target, and risk before choosing an action.</div>
+        </div>
+      </div>
+      <h3>Simulator Ledger</h3>
+      <div class="ledger" id="ledger"></div>
+    </section>
+
+    <section class="card">
+      <h2>Progress Report</h2>
+      <div id="report"></div>
+    </section>
+
+    <p class="footerNote">Educational course only. Not investment, tax, legal, or financial advice. Trading involves risk, including loss of capital.</p>
+  </main>
+</div>
+
+<script>
+const STORAGE_KEY = "chartSchoolComplete.v1";
+
+const levels = [
+{t:"Absolute Beginner",o:"Understand what trading is, what a share represents, and why price changes.",topics:["stocks","price","buyers","sellers"],simple:"Trading is buying and selling assets because you think the price relationship is favorable. A stock is a small ownership piece of a company. A trader is not trying to be certain; a trader is making planned decisions under uncertainty.",why:"Every advanced topic comes back to this: price moves when buyers and sellers compete. If you misunderstand that, indicators and patterns become decoration instead of evidence.",how:["A share is partial ownership in a company.","The market price is the last agreed trade between buyer and seller.","Aggressive buyers lift offers; aggressive sellers hit bids.","A good trade has a plan before money is risked."],ex:"If a stock moves from $50 to $55, buyers were willing to pay higher prices than before.",counter:"A stock going up does not prove it is a good business. It may be hype, a squeeze, or short-term imbalance.",visual:"Buyer pressure                         Seller pressure\n      ++++++++        PRICE        ----\n          \\            $50          /\n           \\____ trade happens ____/\n\nMore urgent buyers -> price tends up\nMore urgent sellers -> price tends down",case:"The 2021 GameStop move showed how price can move violently when buyers, short sellers, options flows, and social attention collide. Some traders made money by respecting exits. Many lost money by confusing excitement with a plan.",mist:["Thinking trading means predicting perfectly.","Buying only because a stock is popular.","Ignoring the risk before thinking about reward."],cheat:["Stock = ownership slice.","Price = current agreement, not guaranteed value.","Trader mindset = plan, risk, review."],form:["Profit on long stock = sell price - buy price.","Percent change = price change / starting price x 100."],v:[["Share","A small ownership piece of a company."],["Ticker","The short symbol used to identify a listed security."],["Long","A position that generally benefits when price rises."],["Market","A system where buyers and sellers meet."]],q:[
+["What most directly causes the quoted stock price to change?",["A company committee manually updates it","Buyers and sellers agree to trades at new prices","The CEO chooses the daily price","A chart pattern forces it"],1,["No central committee sets the price trade by trade.","Correct. Trades occur at prices buyers and sellers accept.","Executives influence businesses, not every tick.","Patterns describe behavior; they do not force price."]],
+["Which is the professional mindset?",["I know this will go up","If the setup fails, I know my exit","I will double down until right","News is always enough"],1,["Certainty is dangerous.","Correct. Planned exits keep losses survivable.","Doubling down can destroy accounts.","News needs context, liquidity, and risk."]],
+["Owning one share means you own...",["A tiny piece of the company","A loan to the company","A guaranteed profit","The right to set price"],0,["Correct.","That is closer to a bond.","No investment guarantees profit.","Shareholders do not set each trade price."]]],a:"Pick one stock you know. Write what the company does, why buyers might want it, and why sellers might want out."},
+{t:"Market Basics",o:"Learn exchanges, brokers, bid, ask, spread, liquidity, and order types.",topics:["broker","bid/ask","spread","liquidity"],simple:"A broker routes your order. An exchange or trading venue matches buyers and sellers. The bid is what buyers offer. The ask is what sellers request. The spread is the gap between them.",why:"Execution quality matters. A great idea can become a bad trade if the spread is wide, liquidity is thin, or you use the wrong order type.",how:["Bid = highest displayed buyer.","Ask = lowest displayed seller.","Spread = ask minus bid.","Market orders prioritize speed; limit orders prioritize price.","Liquidity means you can enter or exit without moving price much."],ex:"A stock with bid $99.98 and ask $100.00 has a tight $0.02 spread, often easier to trade.",counter:"A stock with bid $4.80 and ask $5.20 has a wide spread; you may lose 8% just crossing it.",visual:"Order book snapshot\n\nASKS sellers\n$100.05  500 shares\n$100.02  300 shares\n$100.00  900 shares  <- best ask\n------------------\n$ 99.98  700 shares  <- best bid\n$ 99.95  400 shares\n$ 99.90 1200 shares\nBIDS buyers",case:"During flash crashes, liquidity can vanish. Stops may execute far from expected levels because there are not enough nearby buyers or sellers.",mist:["Using market orders in illiquid names.","Ignoring the bid/ask spread.","Assuming stop orders guarantee exact exit prices."],cheat:["Tight spread usually means easier execution.","Limit order controls price but may not fill.","Market order fills quickly but can slip."],form:["Spread = ask - bid.","Slippage = expected fill - actual fill."],v:[["Bid","Best displayed price buyers are offering."],["Ask","Best displayed price sellers are asking."],["Spread","Gap between bid and ask."],["Liquidity","Ease of trading size without big price impact."]],q:[
+["You want price control more than speed. Which order usually fits?",["Market order","Limit order","Random order","Margin call"],1,["Market orders prioritize speed.","Correct. Limit orders set your acceptable price.","Not a real order type.","A margin call is a broker demand for funds."]],
+["A wide bid/ask spread usually means...",["Execution may be costly","Risk disappears","The company is better","Charts stop working"],0,["Correct.","Risk often increases.","Spread does not measure company quality.","Charts still show price but execution is harder."]],
+["Best bid is $20.00 and best ask is $20.08. Spread?",["$0.08","$0.04","$20.08","8% exactly"],0,["Correct.","That is half the spread.","That is the ask.","$0.08 on $20 is about 0.4%, not 8%."]]],a:"Find a quote page for any liquid stock and write down bid, ask, and spread. If live quotes are delayed, just record what is shown."},
+{t:"Stocks, ETFs, Indexes",o:"Understand common equity products and how broad market exposure works.",topics:["stocks","ETFs","indexes","sectors"],simple:"A stock is one company. An ETF is a basket that trades like a stock. An index is a benchmark, such as the S&P 500, used to measure a group of stocks.",why:"Knowing what you are trading prevents hidden concentration. One company can collapse; a broad ETF spreads risk across many holdings.",how:["Indexes measure baskets but are not always directly traded.","ETFs can track indexes, sectors, commodities, bonds, or strategies.","Sector strength helps traders compare where money is flowing.","Dividends and splits affect prices but not always total value."],ex:"SPY is an ETF designed to track the S&P 500. Buying it gives diversified exposure to large US companies.",counter:"Buying five technology stocks is not true diversification if they all move together.",visual:"Single stock:       [Company A]\nSector ETF:         [A][B][C][D]\nBroad market ETF:   [A][B][C][D][E][F][G][H][I][J]\n\nMore holdings can reduce company-specific risk.",case:"In 2008, many individual financial stocks fell dramatically or failed, while broad indexes also declined but represented a diversified basket instead of one company outcome.",mist:["Thinking an ETF is risk-free.","Confusing an index with an ETF.","Ignoring sector concentration."],cheat:["Stock = company-specific risk.","ETF = basket exposure.","Index = benchmark."],form:["Market cap = share price x shares outstanding.","Dividend yield = annual dividend / share price."],v:[["ETF","A tradable basket of securities."],["Index","A benchmark measuring a group of assets."],["Sector","A market industry group."],["Dividend","Cash paid by some companies to shareholders."]],q:[
+["Which instrument is usually a basket?",["Single common stock","ETF","One call option only","One earnings report"],1,["A stock is one company.","Correct.","An option is a contract, not a basket by itself.","A report is information."]],
+["Why compare sectors?",["To see where money is flowing","To avoid all risk","To guarantee entries","To ignore indexes"],0,["Correct.","Risk remains.","Nothing guarantees entries.","Indexes provide useful context."]],
+["Market cap equals...",["Share price x shares outstanding","Revenue x cash","Bid minus ask","Profit divided by spread"],0,["Correct.","Not market cap.","That is spread.","Not a standard metric."]]],a:"List three stocks and identify their sectors. Then name one ETF that tracks a broad market or sector."},
+{t:"Chart Reading",o:"Read OHLC bars, candlesticks, timeframes, gaps, and clean chart context.",topics:["candles","timeframes","OHLC","gaps"],simple:"A chart compresses many trades into visual bars or candles. Each candle shows open, high, low, and close for one time period.",why:"Before you use patterns or indicators, you must know what each candle actually says about buyer and seller behavior.",how:["Open = first trade in the period.","High = highest trade in the period.","Low = lowest trade in the period.","Close = final trade in the period.","Timeframe changes the story; a 5-minute chart and weekly chart can disagree."],ex:"A candle that opens at $50, trades to $55, drops to $49, and closes at $54 shows buyers recovered control by the close.",counter:"One strong 1-minute candle inside a falling daily trend may be noise, not a true reversal.",visual:"Bull candle          Bear candle\n   high                 high\n    |                    |\n  [   ] close          open [   ]\n  [   ] open           close[   ]\n    |                    |\n   low                  low\n\nBody = open to close\nWick = extremes",case:"The COVID-19 crash in February-March 2020 looked severe on daily candles, while later monthly candles showed a sharp crash and recovery in broader context.",mist:["Using one timeframe only.","Treating every gap as a signal.","Ignoring where the candle appears."],cheat:["Candle = OHLC for one period.","Context beats isolated candles.","Higher timeframe sets the bigger map."],form:["Candle range = high - low.","Body size = absolute value of close - open."],v:[["Open","First price in the candle period."],["Close","Last price in the candle period."],["Wick","High-low extremes outside the body."],["Gap","Space between prior close and next open."]],q:[
+["A daily candle represents...",["One trade","One trading day's OHLC","Only the closing price","The company's earnings"],1,["No, it summarizes many trades.","Correct.","Close is only one part.","Earnings may affect candles but are not the candle."]],
+["Which timeframe gives bigger context?",["Weekly vs 1-minute","1-minute always","Tick chart always","None"],0,["Correct.","Small timeframes can be noisy.","Tick charts are granular, not bigger context.","Timeframe matters."]],
+["A candle wick shows...",["Extreme prices reached during the period","Guaranteed future direction","Company value","Only volume"],0,["Correct.","No candle guarantees direction.","It shows traded prices, not intrinsic value.","Volume is separate."]]],a:"Open any chart and identify the open, high, low, and close of one candle."},
+{t:"Candlestick Patterns",o:"Use candles as context clues without treating them as magic signals.",topics:["engulfing","doji","hammer","failure"],simple:"Candlestick patterns are shorthand for behavior. They can show hesitation, rejection, momentum, or exhaustion, but they only matter in context.",why:"Patterns are popular, but beginners overtrust them. Professionals ask where the pattern happens, what volume says, and where risk is invalidated.",how:["A doji shows open and close are near each other; indecision.","A hammer shows lower-price rejection, often after decline.","An engulfing candle shows one side overwhelmed the prior candle.","Patterns fail often when the broader trend or catalyst disagrees."],ex:"A bullish hammer at long-term support after a selloff is more meaningful than a random hammer in the middle of chop.",counter:"A bullish engulfing candle directly under major resistance can fail quickly.",visual:"Hammer\n   |\n [ ]  small body near top\n   |\n   |\n long lower wick = sellers pushed down, buyers rejected\n\nEngulfing\n small red candle -> large green candle wraps it",case:"Many reversal candles appeared during the 2008 decline before the final bottom. Traders buying every hammer too early were punished because the larger downtrend remained dominant.",mist:["Trading the candle name instead of the location.","Ignoring volume and trend.","No stop under the pattern's invalidation point."],cheat:["Pattern + location + volume > pattern alone.","Invalidation is usually beyond the wick or structure.","Failed patterns can become strong opposite signals."],form:["Pattern risk = entry - invalidation for long trades."],v:[["Doji","Candle with open and close near each other."],["Hammer","Small body with long lower wick."],["Engulfing","Large candle that overwhelms prior body."],["Invalidation","Price level that proves the trade idea wrong."]],q:[
+["Why can a hammer fail?",["Because context may still be bearish","Because candles never matter","Because volume is illegal","Because it guarantees shorts"],0,["Correct.","Candles can matter, but not alone.","Volume is normal market data.","No guarantee."]],
+["A doji usually suggests...",["Indecision","Guaranteed crash","Guaranteed rally","Dividend payment"],0,["Correct.","No guarantee.","No guarantee.","Unrelated."]],
+["Best use of candlestick patterns?",["As context clues with risk levels","As automatic buy signals","Without stop losses","Only on social media"],0,["Correct.","Automatic signals are fragile.","Stops are central.","Not relevant."]]],a:"Find a candle pattern on a chart and write the context: trend, support/resistance, volume, and invalidation."},
+{t:"Technical Analysis Foundations",o:"Understand support, resistance, structure, supply, demand, and why chart levels matter.",topics:["support","resistance","structure","supply/demand"],simple:"Technical analysis studies price, volume, and behavior. Support is an area where buyers previously stepped in. Resistance is an area where sellers previously showed up.",why:"Levels help you define risk. You do not need to know the future if you know where your idea is wrong.",how:["Support can form where demand absorbed selling.","Resistance can form where supply overwhelmed buyers.","Prior highs and lows reveal market structure.","Clean levels are zones, not exact pennies."],ex:"A stock bounces three times near $100. Traders may watch $100 as support and define risk below it.",counter:"A level touched many times can weaken if buyers are repeatedly consumed.",visual:"Resistance zone\n  110 |------x------x------\n      |     / \\    / \\\n  100 |----x---\\--x---\\---- Support zone\n      |___/____\\/_____\\____ time",case:"Major indexes often react near prior highs, lows, and moving averages during corrections. The level matters because many participants can see it and act around it.",mist:["Drawing levels too precisely.","Assuming support cannot break.","Buying support without a stop."],cheat:["Support = demand zone.","Resistance = supply zone.","Structure = sequence of highs and lows."],form:["Range = resistance - support.","Breakout distance = breakout price - resistance."],v:[["Support","Area where buying previously absorbed selling."],["Resistance","Area where selling previously absorbed buying."],["Structure","Pattern of swing highs and swing lows."],["Breakout","Move beyond an important level."]],q:[
+["Support is best understood as...",["A zone where buyers may appear","A guaranteed floor","An earnings number","A broker fee"],0,["Correct.","No level is guaranteed.","Unrelated.","Unrelated."]],
+["Why use zones instead of exact lines?",["Markets are noisy","Math is impossible","Stocks trade once per day only","Brokers require it"],0,["Correct.","Math is possible; precision can be false.","Most stocks trade many times.","No requirement."]],
+["A break below support means...",["Demand may have failed","The stock must go to zero","Risk no longer matters","It is automatically a buy"],0,["Correct.","No such guarantee.","Risk matters more.","Could be dangerous without context."]]],a:"Draw two support zones and two resistance zones on a chart. Explain why each level is visible."},
+{t:"Indicators",o:"Use common indicators as tools, not signals to obey blindly.",topics:["SMA","EMA","RSI","MACD","VWAP"],simple:"Indicators transform price or volume into easier-to-read measurements. They lag, simplify, and sometimes mislead, so they should support a thesis rather than replace one.",why:"Indicators can show trend, momentum, volatility, and mean reversion. They fail when used without market context.",how:["SMA/EMA smooth price to show trend.","RSI measures momentum on a bounded scale.","MACD compares moving averages for momentum shifts.","VWAP shows volume-weighted average intraday price.","ATR estimates typical range, useful for stops."],ex:"A day trader may use VWAP as intraday fair-value context and avoid chasing far above it.",counter:"Shorting every RSI above 70 can fail badly in strong uptrends because overbought can stay overbought.",visual:"Price:  /\\/\\/\\____/\\/\\___\nSMA:     /----\\____/----\\__  smoother, slower\n\nIndicator = lens, not steering wheel.",case:"During powerful bull trends, many stocks repeatedly showed high RSI while continuing higher. Momentum indicators can mark strength, not just reversal risk.",mist:["Using too many indicators.","Assuming indicators predict.","Ignoring that most indicators are derived from price."],cheat:["Trend: moving averages.","Momentum: RSI/MACD.","Volatility: ATR/Bollinger Bands.","Intraday anchor: VWAP."],form:["SMA = sum of closes / number of periods.","VWAP = sum(price x volume) / total volume."],v:[["SMA","Simple moving average."],["EMA","Moving average that weights recent prices more."],["RSI","Momentum oscillator often used to spot strength or exhaustion."],["VWAP","Volume-weighted average price."]],q:[
+["Indicators are best used as...",["Supporting evidence","Guaranteed signals","Broker replacements","Tax forms"],0,["Correct.","No indicator guarantees outcomes.","No.","No."]],
+["VWAP is especially common for...",["Intraday context","Annual dividends","Corporate voting","Tax filing"],0,["Correct.","Unrelated.","Unrelated.","Unrelated."]],
+["Why can RSI over 70 be risky to short automatically?",["Strong trends can stay strong","RSI is always wrong","Shorting is banned","RSI measures dividends"],0,["Correct.","RSI can be useful.","Shorting exists but has rules and risks.","No."]]],a:"Put one moving average and RSI on a chart. Write whether they clarify the chart or clutter it."},
+{t:"Volume Analysis",o:"Read participation, conviction, relative volume, and volume profile basics.",topics:["volume","relative volume","volume profile","participation"],simple:"Volume tells you how many shares traded. Price tells you direction; volume hints at participation and conviction.",why:"A breakout on weak volume may lack sponsorship. A reversal on huge volume may mean forced selling, capitulation, or institutional activity.",how:["High relative volume means unusual participation.","Volume confirms breakouts when activity expands.","Volume profile shows where a lot of trading occurred at price levels.","Low volume moves can reverse easily."],ex:"A stock breaking resistance on 3x normal volume has more evidence than a breakout on sleepy volume.",counter:"Huge volume after bad news can be distribution, not necessarily a bargain bottom.",visual:"Price breakout\n  resistance ----|____\n                 |    \\__\nVolume      ||||||||||||||  expansion supports move",case:"At many market bottoms, capitulation volume appears as panicked selling meets stronger buyers. But capitulation is only obvious afterward, so risk rules still matter.",mist:["Assuming high volume is always bullish.","Ignoring relative volume.","Confusing volume spike with guaranteed reversal."],cheat:["Volume = participation.","Relative volume = today vs normal.","Profile = traded volume by price."],form:["Relative volume = current volume / average volume.","Dollar volume = price x shares traded."],v:[["Volume","Number of shares or contracts traded."],["Relative Volume","Current volume compared with average."],["Volume Profile","Volume displayed by price level."],["Capitulation","Panic selling that may mark exhaustion."]],q:[
+["Breakout with expanding volume suggests...",["More participation","No risk","Guaranteed profit","Lower liquidity always"],0,["Correct.","Risk remains.","No guarantee.","Expanding volume often means more liquidity, not always lower."]],
+["High volume after bad news can mean...",["Distribution or panic, not automatically bullish","Guaranteed bottom","No sellers","Market closed"],0,["Correct.","No guarantee.","High volume means many trades, including sellers.","No."]],
+["Relative volume compares...",["Current activity to normal activity","Bid to ask","Stock to bond","Tax to profit"],0,["Correct.","That is spread.","No.","No."]]],a:"Find a day with unusually high volume and write what price did before, during, and after it."},
+{t:"Trend Analysis",o:"Identify trends, pullbacks, channels, reversals, and trend failure.",topics:["trend","pullback","channel","reversal"],simple:"An uptrend is a sequence of higher highs and higher lows. A downtrend is lower highs and lower lows. Trends persist until evidence says they changed.",why:"Trading with trend can increase probability, but chasing extended trends can create poor risk/reward.",how:["Higher highs and higher lows show buyers defending dips.","Lower highs and lower lows show sellers controlling rallies.","Pullbacks are pauses inside a trend.","A trendline break is evidence, not final proof."],ex:"A swing trader may buy a pullback to rising support in an uptrend with a stop below the prior higher low.",counter:"A stock making new highs after a parabolic run may be trending but still offer terrible risk if stop distance is huge.",visual:"Uptrend\n      HH      HH\n     /  \\    /  \\\n HL /    \\HL/    \\\n___/______________\\____\n\nBreak of HL = first warning",case:"The 2020-2021 post-crash rally rewarded trend-followers, but many late chasers suffered during sharp pullbacks because they bought far from invalidation.",mist:["Calling every bounce a reversal.","Buying far above support.","Moving stops wider because you want to be right."],cheat:["Uptrend = HH + HL.","Downtrend = LH + LL.","Pullback entry needs nearby invalidation."],form:["Trend trade risk = entry - higher low stop.","Channel width = upper trendline - lower trendline."],v:[["Higher High","A swing high above the prior swing high."],["Higher Low","A pullback low above the prior low."],["Pullback","Countermove inside a trend."],["Reversal","Evidence that trend direction changed."]],q:[
+["An uptrend is defined by...",["Higher highs and higher lows","Random green candles","News only","High RSI only"],0,["Correct.","Not enough.","News can help but structure defines trend.","Not enough."]],
+["A pullback is...",["A temporary move against the trend","Always a crash","Always a buy","A dividend"],0,["Correct.","No.","Only if setup and risk fit.","No."]],
+["Buying extended far above support often hurts because...",["Stop distance can be too large","It guarantees a win","Support disappears from all charts","Brokers ban stops"],0,["Correct.","No guarantee.","Support still exists, just far away.","No."]]],a:"Identify whether a chart is in an uptrend, downtrend, range, or transition. Mark the evidence."},
+{t:"Support and Resistance",o:"Trade around levels with zones, retests, invalidation, and false breakouts.",topics:["levels","retest","false breakout","zones"],simple:"Support and resistance are memory zones. Traders remember where price previously turned, trapped them, or rewarded them.",why:"Levels create natural places for entries, stops, targets, and trade invalidation.",how:["A breakout above resistance can turn old resistance into new support.","A failed breakout can trap buyers and reverse hard.","More obvious levels attract more orders.","Clean risk matters more than a perfect line."],ex:"Price breaks above $50, pulls back to $50, holds, then continues. That is a classic breakout-retest idea.",counter:"Price pokes above $50, immediately falls back below, and accelerates down. That is a failed breakout.",visual:"Breakout and retest\nResistance 50 ----|---------\n                  |\\\n                  | \\__ retest holds\n                  |    \\__ continuation",case:"False breakouts are common around widely watched levels because stops and breakout orders cluster there. Professionals often wait for confirmation or use smaller size.",mist:["Entering before the level is clear.","Putting stops exactly where everyone else does.","Ignoring failed breakouts."],cheat:["Level = area of prior reaction.","Retest = market checks the level again.","Failed breakout can be a trade signal itself."],form:["Reward/risk = (target - entry) / (entry - stop) for long trades."],v:[["Retest","Return to check a broken level."],["False Breakout","Move beyond a level that quickly fails."],["Zone","Area rather than exact price."],["Target","Planned profit-taking area."]],q:[
+["Old resistance can become...",["New support","A dividend","A broker","Guaranteed profit"],0,["Correct.","No.","No.","No guarantee."]],
+["A false breakout often traps...",["Breakout buyers","Only long-term investors","Brokers","Market makers only"],0,["Correct.","Anyone can be trapped, but breakout buyers are the classic group.","No.","Not only."]],
+["Why use stops near invalidation?",["Because the trade idea is wrong there","To guarantee a fill at exact price","To avoid all losses","Because stops create profits"],0,["Correct.","Stops can slip.","Losses still happen.","Stops limit damage, not create profits."]]],a:"Find one breakout and one failed breakout. Write what would confirm or invalidate each."},
+{t:"Risk Management",o:"Master position sizing, stop losses, R-multiples, drawdown, expected value, and risk of ruin.",topics:["position sizing","R-multiple","drawdown","expected value"],simple:"Risk management decides how much you can lose before you decide how much you might make. It is the survival system of trading.",why:"A trader with average entries and excellent risk can survive. A trader with great ideas and terrible risk can blow up.",how:["Choose max account risk per trade, often a small percentage.","Place stop where the trade idea is invalid, not where the loss feels nice.","Size position so stop loss equals planned risk.","Track trades in R, where 1R equals amount risked.","Expected value combines win rate and average win/loss."],ex:"With a $10,000 account and 1% risk, max risk is $100. If entry is $50 and stop is $48, risk per share is $2, so size is 50 shares.",counter:"Buying 500 shares in that same setup risks $1,000, or 10% of the account, far too much for one idea.",visual:"Account $10,000\nRisk per trade 1% = $100\nEntry 50, Stop 48 -> risk/share $2\nPosition size = $100 / $2 = 50 shares\n\nLoss if stopped = 50 x $2 = $100",case:"Many highly publicized trading failures were not caused by being wrong once. They came from oversized risk, leverage, and refusing to exit when wrong.",mist:["Sizing first and finding stop later.","Risking more after losses to recover.","Measuring only win rate, not average win/loss."],cheat:["Risk first, reward second.","1R = planned risk.","Small losses are business expenses."],form:["Position size = account risk dollars / risk per share.","Expected value = (win rate x avg win) - (loss rate x avg loss).","Drawdown = decline from equity peak."],v:[["Position Size","Number of shares/contracts traded."],["Stop Loss","Exit designed to limit loss."],["R-Multiple","Profit or loss measured relative to initial risk."],["Drawdown","Drop from account peak to trough."]],q:[
+["Account $20,000, risk 1%, entry $40, stop $38. Shares?",["100","10","1,000","200"],0,["Correct: risk dollars $200 / $2 risk = 100.","Too small for the stated risk.","Too large; would risk $2,000.","Would risk $400."]],
+["Why can a 40% win-rate strategy make money?",["Average wins may be much larger than losses","Win rate below 50% is impossible","Losses do not count","Brokers refund losing trades"],0,["Correct.","Not true.","Losses always count.","No."]],
+["What matters most before entering?",["Where you exit if wrong","How excited you feel","How many likes the idea has","Only the upside"],0,["Correct.","Emotion is not a risk rule.","Popularity is not risk control.","Upside without downside is incomplete."]]],a:"Create three hypothetical trades and calculate position size using 1% account risk."},
+{t:"Trading Psychology",o:"Recognize and manage FOMO, fear, greed, revenge trading, bias, and discipline problems.",topics:["FOMO","discipline","bias","emotions"],simple:"Trading psychology is the skill of following a good process while money, uncertainty, and emotion pressure you to abandon it.",why:"Most damaging trading errors are not math errors. They are behavior errors: chasing, oversizing, revenge trading, and refusing to accept losses.",how:["FOMO makes you enter late because others are winning.","Greed makes you ignore exits and size too large.","Fear makes you skip valid trades or exit too early.","Revenge trading tries to win back money emotionally.","A written plan reduces in-the-moment improvisation."],ex:"After missing a breakout, a disciplined trader waits for a pullback or new setup instead of buying the top.",counter:"A trader loses $200, then immediately doubles size to recover. That is revenge trading, not strategy.",visual:"Trigger -> Emotion -> Urge -> Rule\nMissed move -> FOMO -> chase -> wait for planned entry\nLoss -> anger -> double size -> stop trading for review",case:"The dot-com bubble showed how greed and social proof can overpower valuation and risk. Many traders were right about the internet changing the world but wrong about price and risk.",mist:["Confusing confidence with discipline.","Judging yourself by one trade.","Changing rules mid-trade."],cheat:["Plan before emotion arrives.","Journal urges, not just trades.","Process quality comes before outcome."],form:["Process score = rules followed / rules planned.","Max daily loss = predefined stop for the day."],v:[["FOMO","Fear of missing out."],["Revenge Trading","Trading emotionally to recover losses."],["Loss Aversion","Feeling losses more intensely than gains."],["Discipline","Following rules despite emotional pressure."]],q:[
+["You miss a breakout. Best response?",["Wait for a new planned setup","Market buy from frustration","Double size","Ignore stops"],0,["Correct.","Chasing is FOMO.","Oversizing compounds emotion.","Dangerous."]],
+["Revenge trading usually starts after...",["A loss or missed move","A careful plan","A tax form","A dividend"],0,["Correct.","Plans reduce revenge behavior.","No.","No."]],
+["A process score tracks...",["Whether you followed your rules","Only profit","Only social feedback","Only chart colors"],0,["Correct.","Profit matters but can be random short term.","No.","No."]]],a:"Write your personal emergency rules for FOMO, revenge trading, and overtrading."},
+{t:"Day Trading",o:"Understand intraday structure, opening range, VWAP, liquidity, and execution risk.",topics:["intraday","VWAP","opening range","execution"],simple:"Day trading means opening and closing positions within the same trading day. It emphasizes speed, liquidity, execution, and strict risk limits.",why:"Intraday movement is noisy. Without rules, commissions, spread, slippage, and emotion can overwhelm small edges.",how:["The open often has volatility and false moves.","VWAP can act as intraday fair-value reference.","Opening range breakouts define early structure.","Day traders need max loss per trade and per day.","Flat by close avoids overnight gap risk."],ex:"A trader waits for the first 15-minute range, then takes a breakout only if volume confirms and risk is small.",counter:"Buying the first candle because it is green can lead to immediate reversal after the opening rush.",visual:"Day timeline\n9:30 open | opening range | mid-day chop | power hour | 4:00 close\n\nMore volatility often clusters near open and close.",case:"On high-news days like CPI or Fed announcements, intraday candles can whip violently. Professional day traders often reduce size or wait until spreads normalize.",mist:["Trading illiquid stocks intraday.","No daily max loss.","Overtrading during mid-day chop."],cheat:["Day trade = flat before close.","Open is volatile.","VWAP is intraday context."],form:["Daily max loss often = 2 to 3 planned trade risks.","Scalp net = gross move - spread - slippage - fees."],v:[["Opening Range","High/low formed during early session."],["VWAP","Volume-weighted average price."],["Slippage","Difference between expected and actual fill."],["Flat","No open position."]],q:[
+["Day traders usually care deeply about...",["Liquidity and execution","Only annual reports","Only dividends","Ignoring spreads"],0,["Correct.","Fundamentals can matter, but execution is central.","No.","Spreads matter a lot."]],
+["Why close by end of day?",["Avoid overnight gap risk","Guarantee profit","Avoid taxes","Make charts disappear"],0,["Correct.","No.","No.","No."]],
+["The market open is often...",["Volatile","Always calm","Closed","Risk-free"],0,["Correct.","Often the opposite.","It opens at the open.","Never risk-free."]]],a:"Design a simple day-trading rule set: time window, setup, stop, target, max daily loss."},
+{t:"Swing Trading",o:"Trade multi-day moves using trend, catalysts, entries, stops, and overnight risk.",topics:["multi-day","catalysts","overnight risk","pullbacks"],simple:"Swing trading aims to capture moves over days to weeks. It is slower than day trading but still requires defined entries, exits, and position sizing.",why:"Swing trading suits people who cannot watch every tick, but overnight gaps and news risk must be planned.",how:["Use daily and weekly charts for context.","Look for trend continuation, reversals, or post-catalyst setups.","Stops may need more room than day trades.","Position size must shrink when stop distance is wider."],ex:"A stock in an uptrend pulls back to the 20-day moving average, forms a reversal candle, and offers a stop below the swing low.",counter:"Holding a full-size position through earnings without understanding gap risk can create losses far beyond planned stop levels.",visual:"Weekly trend up\nDaily pullback to support\nEntry after confirmation\nStop below swing low\nTarget near prior high or measured move",case:"Many leaders after the 2020 crash offered swing entries on pullbacks. Traders who sized for wider stops handled volatility better than those using intraday-sized risk.",mist:["Using day-trade size with swing-trade stops.","Ignoring earnings dates.","Selling winners too early without a plan."],cheat:["Swing = days to weeks.","Check catalyst calendar.","Wider stop means smaller size."],form:["Shares = risk dollars / distance to swing stop.","Holding period return = gain / entry price."],v:[["Catalyst","Event that can move price."],["Overnight Risk","Risk while market is closed."],["Swing Low","Local low used for structure."],["Trail Stop","Stop moved to protect gains as trade progresses."]],q:[
+["Swing trades usually last...",["Days to weeks","Seconds only","One tick","Always 10 years"],0,["Correct.","That is scalping/day trading.","No.","That is investing timeframe."]],
+["Why check earnings before swing trading?",["Gap risk can be large","Earnings never matter","It guarantees upside","It removes stops"],0,["Correct.","Earnings can matter a lot.","No.","Stops may not protect from gaps."]],
+["Wider stop should usually mean...",["Smaller position size","Larger position size","No risk","No target"],0,["Correct.","That increases dollar risk.","Risk remains.","Targets still matter."]]],a:"Build one swing trade idea from a chart: entry, stop, target, catalyst check, and risk."},
+{t:"Fundamental Analysis",o:"Read earnings, valuation, financial statements, catalysts, and business quality.",topics:["earnings","valuation","cash flow","moat"],simple:"Fundamental analysis studies the business behind the stock: revenue, profit, debt, cash flow, growth, valuation, and competitive position.",why:"Price can detach from business value short term, but business quality and expectations matter deeply over longer horizons.",how:["Revenue shows sales scale.","Margins show profitability efficiency.","Cash flow shows money actually generated.","Debt affects fragility.","Valuation compares price to business results and expectations."],ex:"A profitable company growing revenue 20% with expanding margins may deserve a higher valuation than a shrinking company with heavy debt.",counter:"A cheap P/E stock can be a value trap if earnings are about to collapse.",visual:"Business analysis stack\nRevenue -> Gross profit -> Operating profit -> Net income\nCash flow -> Debt -> Valuation -> Expectations\n\nStock moves when reality differs from expectations.",case:"In 2022, many high-growth stocks fell sharply as rates rose and investors repriced future cash flows. Good companies can still be bad stocks at excessive prices.",mist:["Using one ratio alone.","Ignoring expectations already priced in.","Confusing good company with good trade."],cheat:["Fundamentals answer what business is worth.","Technical analysis helps timing and risk.","Expectations drive reactions."],form:["P/E = price / earnings per share.","Revenue growth = (new revenue - old revenue) / old revenue.","Free cash flow = operating cash flow - capital expenditures."],v:[["Revenue","Sales generated by a company."],["Margin","Profit as a percentage of revenue."],["P/E","Price-to-earnings ratio."],["Free Cash Flow","Cash left after capital expenditures."]],q:[
+["A good company can be a bad trade when...",["Price already assumes too much","Revenue exists","Charts exist","It has employees"],0,["Correct.","Revenue alone is not enough.","No.","No."]],
+["P/E compares price to...",["Earnings","Volume","Bid","VWAP"],0,["Correct.","No.","No.","No."]],
+["A value trap is...",["A cheap-looking stock with worsening fundamentals","A guaranteed bargain","An options spread","A stop order"],0,["Correct.","No guarantee.","No.","No."]]],a:"Choose one company and write: revenue trend, profitability, debt concern, valuation concern, and possible catalyst."},
+{t:"Options Basics",o:"Understand calls, puts, strikes, expiration, premium, intrinsic and extrinsic value.",topics:["calls","puts","premium","expiration"],simple:"An option is a contract. A call gives the buyer the right, not obligation, to buy shares at a strike price. A put gives the right to sell shares at a strike price.",why:"Options can magnify gains and losses. You must understand time, volatility, and probability before trading them.",how:["Premium is the option price.","Strike is the contract price level.","Expiration is when the contract ends.","Intrinsic value is real in-the-money value.","Extrinsic value is time and volatility value."],ex:"A $50 call when stock is $55 has $5 intrinsic value before considering extrinsic value.",counter:"Buying a call and seeing the stock rise can still lose money if the move is too small, too slow, or implied volatility falls.",visual:"Call buyer payoff at expiration\nProfit\n  ^          /\n  |         /\n  |________/ break-even = strike + premium\n  |       /\n  +------|----------------> stock price\n        strike",case:"Before earnings, options often become expensive because implied volatility rises. After earnings, options can lose value even if direction is right, due to volatility crush.",mist:["Thinking calls are just cheaper stock.","Ignoring expiration.","Buying options with poor liquidity."],cheat:["Call = right to buy.","Put = right to sell.","Premium = cost paid or received.","Expiration matters every day."],form:["Call intrinsic = max(stock - strike, 0).","Put intrinsic = max(strike - stock, 0).","Call breakeven = strike + premium.","Put breakeven = strike - premium."],v:[["Call","Right to buy at strike."],["Put","Right to sell at strike."],["Premium","Price of the option."],["Strike","Contract exercise price."]],q:[
+["A call option gives the buyer the right to...",["Buy shares at strike","Sell shares at strike","Receive dividends guaranteed","Avoid time decay"],0,["Correct.","That is a put.","No.","Long options face time decay."]],
+["A $100 call costs $4. Breakeven at expiration?",["$104","$96","$100","$4"],0,["Correct.","That is put-style math.","Need recover premium too.","Premium alone is not breakeven stock price."]],
+["Why can a correct direction option trade lose?",["Move may be too small, too slow, or IV may fall","Options never work","Stocks cannot move","Premium is free"],0,["Correct.","Options can work with proper use.","No.","Premium is paid or received."]]],a:"Calculate intrinsic value and breakeven for three call and put examples."},
+{t:"Options Greeks",o:"Learn delta, gamma, theta, vega, rho, implied volatility, liquidity, assignment, and exercise.",topics:["delta","theta","vega","IV"],simple:"Greeks estimate how an option price may change when the stock price, time, volatility, or interest rates change.",why:"Options are multidimensional. The stock can move your way while time decay or volatility changes offset the gain.",how:["Delta estimates option change per $1 stock move.","Gamma estimates how delta changes.","Theta estimates daily time decay.","Vega estimates sensitivity to implied volatility.","Rho estimates sensitivity to interest rates, usually less important for short-term retail trades."],ex:"A call with delta .50 may gain about $0.50 if the stock rises $1, before other factors change.",counter:"A high-theta weekly option can decay rapidly even if the chart is quiet.",visual:"Option price drivers\nStock move -> Delta/Gamma\nTime passing -> Theta\nIV change   -> Vega\nRates       -> Rho\n\nOne option, many forces.",case:"Earnings options often have high vega exposure. After the announcement, implied volatility can collapse, hurting long options.",mist:["Ignoring theta on short-dated options.","Buying high IV without a volatility thesis.","Trading options with wide spreads and low open interest."],cheat:["Delta = direction.","Gamma = acceleration.","Theta = time decay.","Vega = volatility."],form:["Approx option change = delta x stock move + vega x IV change - theta x days, simplified.","Extrinsic value = option premium - intrinsic value."],v:[["Delta","Sensitivity to stock price."],["Theta","Sensitivity to time decay."],["Vega","Sensitivity to implied volatility."],["Open Interest","Contracts currently open."]],q:[
+["Theta measures...",["Time decay","Stock ownership","Bid/ask spread only","Dividend yield"],0,["Correct.","No.","No.","No."]],
+["Vega matters most when...",["Implied volatility changes","Market is closed forever","Stock has no options","You trade shares only"],0,["Correct.","No.","No.","Vega is for options."]],
+["Delta .40 roughly means...",["Option may move $0.40 for a $1 stock move","Guaranteed 40% profit","40 days left","40 contracts open"],0,["Correct, simplified.","No guarantee.","No.","No."]]],a:"Pick an options chain and identify delta, theta, vega, bid/ask, and open interest on one contract."},
+{t:"Options Strategies",o:"Understand covered calls, cash-secured puts, vertical spreads, straddles, strangles, and protective puts.",topics:["spreads","income","hedging","volatility"],simple:"Options strategies combine contracts and sometimes stock to shape risk, reward, probability, and volatility exposure.",why:"Strategies let you define risk and express more precise views than simply buying calls or puts.",how:["Covered call = own shares and sell call.","Cash-secured put = sell put while holding cash to buy shares if assigned.","Vertical spread = buy one option and sell another same expiration.","Straddle/strangle = volatility trades using calls and puts.","Protective put = insurance for shares."],ex:"A bull call spread buys a lower-strike call and sells a higher-strike call, reducing cost but capping upside.",counter:"Selling naked options for income can create large losses if risk is undefined.",visual:"Bull call spread\nBuy call at 100, sell call at 110\nMax loss = net debit\nMax gain = width - debit\n\nDefined risk, capped reward.",case:"Income strategies can appear steady until volatility spikes. In sharp market selloffs, short premium traders can lose months of gains quickly if risk is not defined.",mist:["Selling premium without understanding assignment.","Ignoring max loss.","Choosing illiquid strikes."],cheat:["Spreads define trade shape.","Selling options receives premium but carries obligations.","Defined risk is beginner-friendlier."],form:["Vertical max gain = spread width - debit for debit spreads.","Vertical max loss = debit paid for debit spreads.","Covered call effective sale price = stock cost + premium + strike gain if assigned."],v:[["Covered Call","Own stock and sell call."],["Cash-Secured Put","Sell put backed by cash."],["Vertical Spread","Long and short options same type and expiration, different strikes."],["Assignment","Obligation triggered for option seller."]],q:[
+["A bull call spread usually...",["Limits both risk and upside","Has unlimited risk by default","Requires no option knowledge","Guarantees profit"],0,["Correct.","Debit vertical risk is usually debit paid.","Knowledge still needed.","No guarantee."]],
+["Covered call includes...",["Owning shares and selling a call","Buying two puts","Shorting stock only","No stock position"],0,["Correct.","No.","No.","Covered means shares cover the call."]],
+["Undefined-risk short options are dangerous because...",["Losses can be very large","Premium is impossible","Options do not move","Assignment never happens"],0,["Correct.","Premium exists.","Options move.","Assignment can happen."]]],a:"Compare buying a call vs using a bull call spread on the same stock. Write max loss, max gain, and breakeven."},
+{t:"Advanced Options",o:"Learn calendars, butterflies, iron condors, LEAPS, volatility trades, and structure selection.",topics:["iron condor","calendar","butterfly","LEAPS"],simple:"Advanced options strategies are mostly about shaping exposure to direction, time, volatility, and range.",why:"Complexity can hide risk. The point is not to sound advanced; the point is to match the structure to the market thesis.",how:["Iron condor profits if price stays in a range, risk defined by wings.","Butterfly targets a price zone with limited risk and limited reward.","Calendar spread uses different expirations to express time/volatility view.","LEAPS are long-dated options that behave more stock-like but still decay.","Volatility trades need an IV view, not just direction."],ex:"An iron condor on a range-bound index sells an out-of-the-money call spread and put spread.",counter:"Putting on an iron condor before a major event can be risky because the expected range may explode.",visual:"Iron condor payoff\nLoss |\\__________/| Loss\n     |  profit    |\n     +-------------> price\n   lower wing   upper wing\nBest if price stays inside range.",case:"Before known events, implied volatility often rises. Afterward, range strategies can benefit if realized move is smaller than implied, but can lose if the move exceeds expectations.",mist:["Adding legs without understanding payoff.","Ignoring early assignment risk.","Trading complex spreads in illiquid chains."],cheat:["Condor = range thesis.","Calendar = time/volatility thesis.","LEAPS = long-term directional option."],form:["Iron condor max loss = spread width - credit received.","Iron condor max gain = credit received.","Long call LEAPS breakeven = strike + premium."],v:[["Iron Condor","Short call spread plus short put spread."],["Butterfly","Limited-risk structure centered around a target price."],["Calendar","Same strike, different expirations."],["LEAPS","Long-term equity anticipation securities."]],q:[
+["Iron condors generally prefer...",["Price staying within a range","Huge move beyond wings","No options liquidity","Ignoring IV"],0,["Correct.","That hurts condors.","Liquidity matters.","IV matters."]],
+["A calendar spread mainly involves...",["Different expirations","Only stock shares","No time component","Guaranteed assignment"],0,["Correct.","No.","Time is central.","No."]],
+["Advanced strategy selection should start with...",["A clear thesis about direction, time, volatility, and range","Using the most legs possible","Copying a screenshot","Avoiding max loss math"],0,["Correct.","More legs do not mean better.","No.","Max loss is essential."]]],a:"Choose one advanced options strategy and write the exact market condition where it might make sense and where it would fail."},
+{t:"Market Structure",o:"Understand participants, auctions, liquidity, stops, order flow concepts, and market regimes.",topics:["auction","liquidity","stops","regime"],simple:"Markets are auctions. Price searches for areas where enough buyers and sellers are willing to transact.",why:"Understanding structure helps explain why price runs to obvious highs/lows, pauses at high-volume areas, and changes behavior across regimes.",how:["Liquidity often rests near obvious highs, lows, and round numbers.","Stops can become market orders when triggered.","Regimes include trend, range, high volatility, and low volatility.","Institutions care about size and liquidity more than perfect entries."],ex:"Price may push above a prior high, trigger breakout buys and short stops, then reverse if demand is not sustained.",counter:"Not every move to a prior high is manipulation. It can simply be auction mechanics and liquidity seeking.",visual:"Prior high = visible liquidity\n        stop orders above\n             v\nPrice ___/\\____  sweep high, then accept or reject\n\nAcceptance = holds above\nRejection = falls back below",case:"Sharp intraday reversals around obvious levels are common because stop orders and breakout orders cluster there. The key is whether price accepts beyond the level.",mist:["Calling every loss manipulation.","Ignoring market regime.","Using advanced structure terms without testable rules."],cheat:["Market = auction.","Liquidity clusters near obvious levels.","Regime determines which tactics work."],form:["Acceptance test = time spent beyond level + volume + failed return.","Range midpoint = (high + low) / 2."],v:[["Liquidity","Available buying/selling interest."],["Auction","Process of price discovery."],["Regime","Current market behavior environment."],["Acceptance","Price holding beyond a key level."]],q:[
+["A market is best viewed as...",["An auction","A certainty machine","A fixed-price store","A savings account"],0,["Correct.","No certainty.","Prices change.","Trading is not savings."]],
+["Liquidity often clusters near...",["Obvious highs/lows and round numbers","Random invisible places only","Tax dates only","Company logos"],0,["Correct.","Not only invisible.","No.","No."]],
+["Regime matters because...",["Strategies work differently in trends vs ranges","All strategies always work","Volatility is fake","Charts stop updating"],0,["Correct.","False.","No.","No."]]],a:"Label a chart as trend, range, high-volatility, or low-volatility. Write which strategies fit and which do not."},
+{t:"Supply, Demand, Order Blocks, FVG",o:"Use modern price-action concepts carefully and testably.",topics:["supply/demand","order blocks","fair value gaps","liquidity"],simple:"Supply and demand zones mark areas where imbalance previously appeared. Order block and fair value gap concepts try to describe institutional activity and inefficient price movement.",why:"These concepts can help frame risk, but they become dangerous if used as vague labels without objective rules.",how:["Demand zone = area where buying overwhelmed selling.","Supply zone = area where selling overwhelmed buying.","Fair value gap = fast move leaving little overlap between candles.","Order block is often defined as the last opposing candle before displacement.","Require confirmation and invalidation."],ex:"A strong rally leaves a demand zone near the base. A later pullback into that zone may offer a defined-risk setup if buyers return.",counter:"Marking every candle as an order block creates clutter and no edge.",visual:"Demand zone with displacement\n     _________\n    / fast move\n___/ \n[base]  <- demand zone\n\nReturn to base: watch reaction, do not assume.",case:"Modern liquidity concepts became popular because they describe real auction behavior, but many online versions are subjective. Professionals translate concepts into testable rules.",mist:["Using vague zones that cover half the chart.","No invalidation rule.","Assuming institutional labels prove a trade."],cheat:["Zone must be specific.","Displacement matters.","Reaction confirms; labels do not."],form:["Zone risk = entry - zone invalidation.","Imbalance fill % = portion of gap revisited."],v:[["Demand Zone","Area where buying imbalance appeared."],["Supply Zone","Area where selling imbalance appeared."],["Fair Value Gap","Fast move with limited candle overlap."],["Order Block","Often last opposing candle before displacement."]],q:[
+["These concepts are safest when...",["Defined with objective rules","Used as mystical certainty","Drawn everywhere","Never backtested"],0,["Correct.","No.","Too many zones destroy clarity.","Testing matters."]],
+["A demand zone suggests...",["Buyers previously overwhelmed sellers","Guaranteed bounce","Company profit","No risk"],0,["Correct.","No guarantee.","No.","Risk remains."]],
+["Reaction at the zone is important because...",["It confirms whether buyers/sellers are still active","Labels alone are enough","Stops are illegal","Volume disappears"],0,["Correct.","Labels alone are weak.","No.","No."]]],a:"Pick one supply or demand zone and define objective entry, invalidation, and target rules."},
+{t:"Wyckoff and Dow Theory",o:"Understand accumulation, distribution, trend phases, and classic market theory.",topics:["Wyckoff","Dow Theory","accumulation","distribution"],simple:"Dow Theory explains trends and confirmation. Wyckoff studies how large operators may accumulate before advances and distribute before declines.",why:"These frameworks teach patience, phase recognition, and the difference between random movement and structured campaigns.",how:["Dow Theory focuses on primary trends, secondary reactions, and confirmation.","Wyckoff accumulation moves from selling pressure to demand control.","Distribution moves from demand control to supply control.","Volume and range help interpret effort vs result."],ex:"A base with repeated failed breakdowns, rising lows, and expanding volume on rallies may show accumulation.",counter:"Calling every sideways range accumulation is premature; it may be distribution or simple balance.",visual:"Wyckoff simplified\nAccumulation: selloff -> base -> spring -> markup\nDistribution: rally -> top -> upthrust -> markdown\n\nPhase labels require evidence.",case:"Many market bottoms show long basing behavior before sustained markup. But the framework is interpretive, so risk levels and confirmation are essential.",mist:["Forcing labels after the fact.","Ignoring broader market trend.","No clear phase invalidation."],cheat:["Accumulation = stronger hands absorb supply.","Distribution = supply overwhelms late demand.","Effort vs result compares volume to price progress."],form:["Effort/result clue = high volume + little progress may show absorption.","Trend confirmation = related averages/indexes confirming direction."],v:[["Accumulation","Potential absorption before advance."],["Distribution","Potential selling before decline."],["Spring","Temporary breakdown that reverses."],["Upthrust","Temporary breakout that reverses."]],q:[
+["Wyckoff is mainly about...",["Accumulation/distribution behavior","Tax accounting","Option greeks only","Dividend schedules"],0,["Correct.","No.","No.","No."]],
+["Effort vs result compares...",["Volume to price progress","Taxes to profits","Bids to CEOs","Strike to broker"],0,["Correct.","No.","No.","No."]],
+["A spring is...",["A failed breakdown that reverses upward","A guaranteed buy","Only an earnings event","A moving average"],0,["Correct.","No guarantee.","No.","No."]]],a:"Find a range and argue both sides: why it might be accumulation and why it might be distribution."},
+{t:"Strategy Building",o:"Build a complete trading strategy with entry, exit, filters, risk, and invalidation.",topics:["entry","exit","rules","edge"],simple:"A strategy is a repeatable decision process. It says when to trade, when not to trade, how much to risk, where to exit, and how to review results.",why:"Without explicit rules, you cannot know whether you have an edge or just a collection of lucky and unlucky guesses.",how:["Define market and timeframe.","Define setup conditions.","Define trigger for entry.","Define stop, target, and management.","Define risk per trade and max trades.","Define what invalidates the strategy."],ex:"A pullback strategy might require: daily uptrend, pullback to rising 20 EMA, bullish reversal candle, volume above average, stop below swing low, target 2R.",counter:"A vague rule like 'buy strong stocks' cannot be tested or improved.",visual:"Strategy template\nMarket -> Setup -> Trigger -> Entry -> Stop -> Target -> Management -> Review\n\nIf any box is vague, the strategy is not ready.",case:"Many professional systems are simple but precise. Their power comes from consistent execution, risk control, and review, not from secret indicators.",mist:["Too many conditions that rarely occur.","No written exit rules.","Changing rules after every loss."],cheat:["Rules must be observable.","Every entry needs invalidation.","Review batches of trades, not one outcome."],form:["Edge = positive expected value after costs.","Trade expectancy in R = win rate x avg R win - loss rate x avg R loss."],v:[["Setup","Market condition you want."],["Trigger","Specific event that enters the trade."],["Edge","Positive expectancy over many trades."],["Filter","Condition that blocks low-quality trades."]],q:[
+["A strategy must be...",["Repeatable and testable","A feeling","Secret to work","Profitable every trade"],0,["Correct.","Feelings are not enough.","No.","Losses are normal."]],
+["The entry trigger is...",["The exact event that gets you in","A vague hope","The yearly report only","Your account size"],0,["Correct.","Not testable.","Could be catalyst, not always trigger.","Risk sizing uses account size."]],
+["Why write exit rules?",["To avoid emotional improvisation","To guarantee profit","Because brokers require essays","To ignore risk"],0,["Correct.","No guarantee.","No.","Opposite."]]],a:"Write a full strategy checklist with setup, trigger, stop, target, risk, and no-trade filters."},
+{t:"Backtesting",o:"Test strategies using historical data while avoiding curve fitting and false confidence.",topics:["backtest","sample size","curve fitting","forward test"],simple:"Backtesting checks how rules would have performed in the past. It is useful, but only if done honestly and then validated forward.",why:"A strategy that looks amazing after over-optimization may fail live. You need enough trades, realistic costs, and out-of-sample testing.",how:["Use fixed rules before reviewing results.","Record every valid signal, not just pretty examples.","Include spread, slippage, and commissions where relevant.","Separate development data from validation data.","Forward test with paper trades before risking capital."],ex:"Testing 200 pullback trades across different market regimes is more informative than cherry-picking five winners.",counter:"Adjusting parameters until one stock looks perfect is curve fitting.",visual:"Build -> Backtest -> Out-of-sample -> Paper trade -> Small live -> Scale carefully\n\nSkipping validation creates false confidence.",case:"Quant funds and discretionary traders both suffer when models overfit past conditions. Regime shifts expose strategies built only for one environment.",mist:["Cherry-picking examples.","Ignoring transaction costs.","Changing rules mid-test."],cheat:["Backtest rules, not vibes.","Sample size matters.","Forward test before live risk."],form:["Expectancy = average R per trade.","Profit factor = gross profit / gross loss.","Max drawdown = largest peak-to-trough decline."],v:[["Backtest","Historical test of rules."],["Curve Fitting","Over-optimizing to past data."],["Out-of-Sample","Data not used to build the strategy."],["Forward Test","Paper/live test going forward."]],q:[
+["Curve fitting means...",["Over-optimizing for past data","Using any chart","Managing risk","Taking notes"],0,["Correct.","No.","No.","No."]],
+["A good backtest includes...",["All valid signals and costs","Only winners","No rules","Changed stops after the fact"],0,["Correct.","Cherry-picking.","Rules required.","Hindsight bias."]],
+["Forward testing checks...",["How rules behave going forward","Only old trades","Tax rate","Company logo"],0,["Correct.","That is backtesting.","No.","No."]]],a:"Design a backtest sheet with columns: date, setup, entry, stop, target, result R, mistake, notes."},
+{t:"Trading Plan",o:"Create a personal plan covering markets, routines, risk limits, strategy, psychology, and review.",topics:["plan","routine","journal","review"],simple:"A trading plan is your operating manual. It prevents random decisions and gives you a way to improve deliberately.",why:"Consistency comes from process. A plan tells you what to do before the market pressures you.",how:["Define markets and timeframes.","Define strategies you are allowed to trade.","Define max risk per trade, day, week, and month.","Define pre-market and post-market routine.","Define journaling and review schedule.","Define rules for stopping after emotional errors."],ex:"A beginner plan may allow only one swing strategy, 0.5% risk per trade, no earnings holds, and weekly review.",counter:"A plan that says 'make money and avoid bad trades' is not actionable.",visual:"Daily routine\nPrepare -> Watchlist -> Wait -> Execute -> Journal -> Review\n\nPlan quality = clarity before stress.",case:"Professional desks use risk limits, playbooks, reviews, and accountability. The individual trader needs the same structure at smaller scale.",mist:["Plan too complex to follow.","No review schedule.","No rules for emotional shutdown."],cheat:["Plan = what, when, how much, why, review.","Journaling converts experience into learning.","Limits protect future you."],form:["Weekly process score = followed rules / planned trades.","Monthly risk cap = max acceptable drawdown before reducing size."],v:[["Playbook","Documented set of setups."],["Journal","Record of decisions and results."],["Watchlist","Prepared list of potential trades."],["Risk Limit","Maximum allowed loss by trade/day/week/month."]],q:[
+["A trading plan should be written...",["Before trading stress arrives","After every loss only","Only in your head","Only for professionals"],0,["Correct.","Too late.","Memory bends under stress.","Beginners need it too."]],
+["Journaling helps because...",["It turns trades into data","It guarantees wins","It replaces stops","It predicts news"],0,["Correct.","No.","No.","No."]],
+["A max loss limit is designed to...",["Stop damage during bad conditions or bad behavior","Prevent all losses","Increase revenge trading","Avoid learning"],0,["Correct.","Losses still occur.","Opposite.","No."]]],a:"Draft your first trading plan with risk limits, allowed setups, daily routine, and review schedule."},
+{t:"Common Mistakes",o:"Recognize the most common account-damaging errors and build prevention rules.",topics:["overtrading","chasing","oversizing","no journal"],simple:"Most beginner losses come from repeated preventable mistakes: oversized trades, late entries, no stops, revenge trading, and strategy hopping.",why:"Avoiding large mistakes can matter more than finding brilliant trades. Survival creates the time needed to learn.",how:["Convert each mistake into a rule.","Use checklists before entry.","Reduce size after rule breaks.","Review missed trades and bad trades separately.","Measure process quality, not just P/L."],ex:"Mistake: chasing breakouts late. Rule: no entry if price is more than 1 ATR from the breakout level.",counter:"Saying 'I will be more disciplined' without a concrete rule rarely changes behavior.",visual:"Mistake -> Rule\nChasing -> require pullback or defined stop\nOversizing -> calculator before order\nRevenge -> stop trading after 2 rule breaks\nNo journal -> log before next trade",case:"Many speculative manias reward bad habits briefly, then punish them severely when conditions change. The habits formed during easy markets often become losses later.",mist:["Adding to losers without plan.","Taking trades outside playbook.","Changing strategy after normal drawdown."],cheat:["Every repeated mistake needs a mechanical guardrail.","Rule break size should go down, not up.","No journal means no feedback loop."],form:["Mistake rate = rule breaks / total trades.","Recovery needed after loss = loss / (1 - loss). Example: 20% loss needs 25% gain."],v:[["Overtrading","Taking too many low-quality trades."],["Chasing","Entering after the favorable entry has passed."],["Rule Break","Trade behavior outside plan."],["Guardrail","Predefined protection against a mistake."]],q:[
+["Best response to repeated oversizing?",["Mechanical position-size calculator","Promise to feel calmer","Increase leverage","Stop using stops"],0,["Correct.","Vague promises are weak.","Dangerous.","Dangerous."]],
+["After a rule break, size should usually...",["Decrease or stop trading","Increase","Double","Ignore it"],0,["Correct.","Increasing rewards bad behavior.","Dangerous.","No."]],
+["Why track mistake rate?",["It reveals behavior patterns","It guarantees profit","It replaces charts","It removes risk"],0,["Correct.","No.","No.","No."]]],a:"List your top three likely trading mistakes and write one guardrail for each."},
+{t:"Professional Thinking",o:"Think in probabilities, scenarios, risk, execution quality, and review cycles.",topics:["probability","scenarios","execution","review"],simple:"Professional traders do not need to be right all the time. They need favorable expectancy, controlled losses, and repeatable execution.",why:"This mindset separates process from outcome. A good trade can lose; a bad trade can win. The review must judge the decision, not just the result.",how:["Think in scenarios: bullish, bearish, neutral.","Know what evidence changes your view.","Predefine risk and size.","Track execution quality and slippage.","Review in batches to avoid emotional overreaction."],ex:"A trader says: 'If price accepts above resistance, I am long. If it rejects, I stand aside or short. My risk is 0.5%.'",counter:"A trader says: 'This has to go up because I need the money.' That is emotional dependence, not analysis.",visual:"Professional decision loop\nHypothesis -> Evidence -> Trade plan -> Execute -> Journal -> Review -> Adjust\n\nOutcome is one data point. Process is the system.",case:"Famous macro and equity traders often describe losing trades as normal business costs. Their edge comes from asymmetric reward, risk limits, and adapting when wrong.",mist:["Needing a trade every day.","Taking losses personally.","Confusing one win with proof of skill."],cheat:["Probabilities, not certainties.","Scenarios, not predictions.","Review batches, not emotions."],form:["Asymmetry = average win / average loss.","Skill estimate improves as sample size grows."],v:[["Scenario Planning","Preparing for multiple possible outcomes."],["Asymmetry","Reward larger than risk."],["Sample Size","Number of trades observed."],["Execution Quality","How well fills and actions matched the plan."]],q:[
+["A good trade can...",["Lose money","Never lose","Ignore risk","Need no plan"],0,["Correct. Outcome and decision quality differ.","False.","No.","No."]],
+["Scenario planning means...",["Preparing for bullish, bearish, and neutral outcomes","Predicting one future with certainty","Never trading","Only reading news"],0,["Correct.","Certainty is fragile.","No.","No."]],
+["Professionals review...",["Process and batches of trades","Only one winner","Only emotions","Never"],0,["Correct.","Too narrow.","Emotions matter, but process data matters too.","False."]]],a:"Write three scenarios for a stock: bullish trigger, bearish trigger, and no-trade condition."},
+{t:"Consistency Capstone",o:"Combine chart reading, risk, psychology, options awareness, strategy, and review into one complete plan.",topics:["capstone","process","risk","independence"],simple:"Consistency is not a feeling. It is the result of a defined process repeated through different market conditions with controlled risk.",why:"By the end of this course, your goal is not to know every indicator. Your goal is to know what you trade, why you trade it, how you manage risk, and how you improve.",how:["Choose one primary strategy first.","Backtest enough examples to understand behavior.","Paper trade forward to practice execution.","Start tiny if going live, and only after rules are stable.","Review monthly and adjust deliberately, not emotionally."],ex:"A complete beginner-to-intermediate plan might trade only daily-chart pullbacks in liquid large-cap stocks, risk 0.5% per trade, avoid earnings, target 2R, and review every 20 trades.",counter:"Trying to day trade, swing trade, scalp options, sell condors, and follow news all at once creates confusion and no clean feedback.",visual:"Your trading business\nEducation -> One strategy -> Backtest -> Paper trade -> Small live -> Review -> Improve\n\nDo less, measure more, survive longer.",case:"Many consistent traders specialize. They may understand many tools, but they do not use all of them at once. Focus creates cleaner learning.",mist:["Graduating into complexity too fast.","Ignoring weak-topic review.","Scaling size before process is stable."],cheat:["One playbook first.","Risk small enough to learn.","Consistency = process over sample size."],form:["Readiness score = plan clarity + backtest quality + paper execution + risk discipline.","Scale-up rule = increase size only after a predefined sample with acceptable drawdown and rule adherence."],v:[["Capstone","Final integrated project."],["Specialization","Focusing on a narrow edge."],["Readiness","Evidence that process is stable enough for more risk."],["Consistency","Repeatable process with controlled risk over time."]],q:[
+["Best next step after learning many concepts?",["Choose one strategy and test it","Trade everything","Use maximum leverage","Stop journaling"],0,["Correct.","Too scattered.","Dangerous.","Journaling remains vital."]],
+["Scaling size should happen after...",["Evidence of stable process","One lucky winner","Feeling bored","A social media post"],0,["Correct.","One trade proves little.","Emotion is not evidence.","No."]],
+["The final goal is...",["Independent, risk-aware decision making","Memorizing every pattern name","Never losing","Predicting every candle"],0,["Correct.","Names are secondary.","Losses are normal.","Impossible."]]],a:"Build your full trading plan: market, strategy, setup, trigger, stop, target, risk, review, psychology rules, and options rules if applicable."}
+];
+
+const state = loadState();
+let current = Math.min(state.current || 0, levels.length - 1);
+let toy = {price:50, history:[50,50.15,50.05,50.22,50.18]};
+let selectedTerm = null, matchDone = new Set(), simScenario = null;
+
+function defaultState(){
+  return {unlocked:0,current:0,scores:{},misses:{},notes:{},trades:[],strong:{},weak:{},quizAnswered:{}};
+}
+function loadState(){
+  try{return Object.assign(defaultState(), JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"))}catch(e){return defaultState()}
+}
+function saveState(){localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); renderStats();}
+function el(id){return document.getElementById(id)}
+function pct(n){return Math.round(n)+"%"}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+function renderNav(){
+  const nav = el("levelNav"); nav.innerHTML = "";
+  levels.forEach((lv,i)=>{
+    const b = document.createElement("button");
+    b.className = (i===current?"active ":"") + (i>state.unlocked?"locked":"");
+    b.innerHTML = `<span class="num">${String(i+1).padStart(2,"0")}</span><span>${esc(lv.t)}</span><span class="lock">${i>state.unlocked?"locked":(state.scores[i]!=null?state.scores[i]+"%":"open")}</span>`;
+    b.onclick = () => { if(i<=state.unlocked){ current=i; state.current=i; saveState(); renderLevel(); } };
+    nav.appendChild(b);
+  });
+}
+
+function renderStats(){
+  const completed = Object.keys(state.scores).length;
+  const progress = completed / levels.length * 100;
+  el("progressText").textContent = pct(progress);
+  el("progressBar").style.width = progress + "%";
+  const scores = Object.values(state.scores);
+  el("avgText").textContent = scores.length ? pct(scores.reduce((a,b)=>a+b,0)/scores.length) : "0%";
+  el("tradeText").textContent = state.trades.length;
+  const weak = Object.entries(state.weak||{}).sort((a,b)=>b[1]-a[1])[0];
+  el("weakText").textContent = weak ? weak[0] : "None";
+  renderReport();
+}
+
+function renderLevel(){
+  const lv = levels[current];
+  renderNav();
+  el("levelPill").textContent = `Level ${current+1} of ${levels.length}`;
+  el("eyebrow").textContent = lv.t;
+  el("title").textContent = lv.t;
+  el("objective").textContent = lv.o;
+  el("topicChips").innerHTML = lv.topics.map(x=>`<span class="chip">${esc(x)}</span>`).join("");
+  el("simple").textContent = lv.simple;
+  el("why").textContent = lv.why;
+  el("howList").innerHTML = lv.how.map(x=>`<li>${esc(x)}</li>`).join("");
+  el("example").textContent = lv.ex;
+  el("counter").textContent = lv.counter;
+  el("visual").textContent = lv.visual;
+  el("caseStudy").textContent = lv.case;
+  el("mistakes").innerHTML = lv.mist.map(x=>`<li>${esc(x)}</li>`).join("");
+  el("cheats").innerHTML = lv.cheat.map(x=>`<li>${esc(x)}</li>`).join("");
+  el("formulas").innerHTML = lv.form.map(x=>`<li>${esc(x)}</li>`).join("");
+  el("assignment").textContent = lv.a;
+  el("assignmentNotes").value = state.notes[current] || "";
+  renderFlashcards(lv);
+  renderMatching(lv);
+  renderQuiz(lv);
+  renderTutor("default");
+  newScenario();
+  renderStats();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderFlashcards(lv){
+  el("flashcards").innerHTML = lv.v.map(([term,def])=>`
+    <button class="flash" type="button" aria-label="Flashcard ${esc(term)}">
+      <span class="flashInner"><span class="front">${esc(term)}</span><span class="back">${esc(def)}</span></span>
+    </button>`).join("");
+  document.querySelectorAll(".flash").forEach(f=>f.onclick=()=>f.classList.toggle("flipped"));
+}
+
+function renderMatching(lv){
+  selectedTerm = null; matchDone = new Set();
+  const defs = lv.v.map((x,i)=>({i,def:x[1]})).sort(()=>Math.random()-.5);
+  el("matchArea").innerHTML = `<div class="matchCol">${lv.v.map((x,i)=>`<button class="matchItem term" data-i="${i}">${esc(x[0])}</button>`).join("")}</div>
+  <div class="matchCol">${defs.map(x=>`<button class="matchItem def" data-i="${x.i}">${esc(x.def)}</button>`).join("")}</div>`;
+  el("matchFeedback").className="feedback"; el("matchFeedback").textContent="Match all pairs to strengthen vocabulary.";
+  document.querySelectorAll(".term").forEach(b=>b.onclick=()=>{ if(matchDone.has(b.dataset.i))return; selectedTerm=b.dataset.i; document.querySelectorAll(".term").forEach(x=>x.classList.remove("selected")); b.classList.add("selected"); });
+  document.querySelectorAll(".def").forEach(b=>b.onclick=()=>{ if(selectedTerm==null || matchDone.has(b.dataset.i))return; if(b.dataset.i===selectedTerm){ matchDone.add(b.dataset.i); document.querySelectorAll(`[data-i="${b.dataset.i}"]`).forEach(x=>{x.classList.add("done");x.classList.remove("selected")}); selectedTerm=null; el("matchFeedback").className="feedback good"; el("matchFeedback").textContent= matchDone.size===lv.v.length ? "All matched. Nice vocabulary control." : "Correct match. Keep going."; } else { el("matchFeedback").className="feedback bad"; el("matchFeedback").textContent="Not that one. Compare the term to the definition and try again."; } });
+}
+
+function renderQuiz(lv){
+  const answered = state.quizAnswered[current] || {};
+  let html = "";
+  lv.q.forEach((q,qi)=>{
+    html += `<div class="card compact"><h3>Question ${qi+1}</h3><p class="quizQ">${esc(q[0])}</p><div class="quizOptions">`;
+    q[1].forEach((opt,oi)=>{
+      const picked = answered[qi] === oi;
+      const cls = picked ? (oi===q[2]?" correct":" incorrect") : "";
+      html += `<button class="option${cls}" data-q="${qi}" data-o="${oi}" ${answered[qi]!=null?"disabled":""}>${esc(opt)}</button>`;
+    });
+    if(answered[qi]!=null){ html += quizFeedback(q, answered[qi]); }
+    html += `</div></div>`;
+  });
+  html += `<div class="actions"><button class="btn primary" id="gradeBtn">Grade checkpoint</button><button class="btn" id="retryBtn">Retry quiz</button></div><div id="gradeBox" class="feedback ${state.scores[current]>=80?"good":""}">${state.scores[current]!=null ? "Saved score: "+state.scores[current]+"%" : "Answer every question, then grade."}</div>`;
+  el("quizArea").innerHTML = html;
+  document.querySelectorAll(".option").forEach(b=>b.onclick=()=>answerQuestion(+b.dataset.q,+b.dataset.o));
+  el("gradeBtn").onclick = gradeQuiz;
+  el("retryBtn").onclick = ()=>{ delete state.quizAnswered[current]; delete state.scores[current]; saveState(); renderQuiz(levels[current]); };
+}
+function quizFeedback(q,picked){
+  const ok = picked===q[2];
+  return `<div class="feedback ${ok?"good":"bad"}"><b>${ok?"Correct.":"Not yet."}</b><br>${q[3].map((x,i)=>`${i===q[2]?"Correct answer":("Choice "+String.fromCharCode(65+i))}: ${esc(x)}`).join("<br>")}</div>`;
+}
+function answerQuestion(qi,oi){
+  state.quizAnswered[current] = state.quizAnswered[current] || {};
+  state.quizAnswered[current][qi] = oi;
+  const q = levels[current].q[qi];
+  const topic = levels[current].topics[0];
+  if(oi===q[2]) state.strong[topic]=(state.strong[topic]||0)+1; else state.weak[topic]=(state.weak[topic]||0)+1;
+  saveState(); renderQuiz(levels[current]);
+}
+function gradeQuiz(){
+  const ans = state.quizAnswered[current] || {};
+  if(Object.keys(ans).length < levels[current].q.length){ el("gradeBox").className="feedback bad"; el("gradeBox").textContent="Answer every question first."; return; }
+  let correct = 0; levels[current].q.forEach((q,i)=>{ if(ans[i]===q[2]) correct++; });
+  const score = Math.round(correct / levels[current].q.length * 100);
+  state.scores[current] = score;
+  if(score>=80 && current===state.unlocked && current<levels.length-1) state.unlocked++;
+  saveState(); renderQuiz(levels[current]); renderNav();
+  el("gradeBox").className = "feedback " + (score>=80?"good":"bad");
+  el("gradeBox").textContent = score>=80 ? `Score ${score}%. Next level unlocked.` : `Score ${score}%. Review the explanations and retry.`;
+}
+
+function renderTutor(style){
+  const lv=levels[current];
+  const base = {
+    default:"Pick an explanation style whenever you are confused.",
+    ten:`Imagine trading like choosing whether to trade a collectible card. You do not know tomorrow's price, so you ask: who wants it, what might make it valuable, and how much could I lose if I am wrong? This level is about ${lv.topics[0]}.`,
+    sports:`Think of ${lv.topics[0]} like reading a game. The scoreboard matters, but so do momentum, defense, fatigue, and time left. A trader reads evidence, then manages the downside if the play fails.`,
+    game:`In a strategy game, you do not spend all resources on one move. You scout, choose a setup, define your retreat point, and preserve enough resources for the next round. That is the trading version of ${lv.topics[0]}.`,
+    steps:`Step 1: identify the market condition. Step 2: define the evidence. Step 3: plan entry, stop, and target. Step 4: size the trade. Step 5: review whether the decision followed the plan.`
+  };
+  el("tutorBox").textContent = base[style] || base.default;
+}
+
+function nudge(dir){
+  const change = (Math.random()*0.28+0.06)*dir;
+  toy.price = Math.max(1, toy.price + change);
+  toy.history.push(toy.price); if(toy.history.length>28) toy.history.shift();
+  el("toyPrice").textContent = toy.price.toFixed(2);
+  el("toyHint").textContent = dir>0 ? "Aggressive buyers lifted price. Now ask: was it meaningful or just noise?" : "Aggressive sellers pushed price down. Now ask: is supply temporary or changing the trend?";
+  renderTape();
+}
+function renderTape(){
+  const min=Math.min(...toy.history), max=Math.max(...toy.history), range=max-min||1;
+  el("tape").innerHTML = toy.history.map((p,i)=>`<span class="tick ${i&&p<toy.history[i-1]?"red":""}" style="height:${8+(p-min)/range*42}px"></span>`).join("");
+}
+
+const scenarios = [
+  {name:"Breakout retest",text:"Price broke resistance and is retesting it with lighter selling. Plan a trade only if risk/reward is acceptable.",bias:"long",pts:[42,43,44,45,45,46,48,50,49,50,51,52,54,53,52,51,52,53,55,57],entry:52,stop:49,target:58},
+  {name:"Failed breakout",text:"Price poked above a prior high, rejected, and fell back into range. This tests your ability not to chase.",bias:"short",pts:[35,36,37,38,39,40,42,43,44,46,45,43,41,40,39,38,37,36],entry:40,stop:44,target:34},
+  {name:"Choppy range",text:"Price is inside a noisy range with no clean edge. Skipping is sometimes the best trade.",bias:"skip",pts:[60,61,59,60,62,61,59,58,60,61,60,62,61,59,60,61,59,60],entry:60,stop:57,target:64},
+  {name:"Downtrend pullback",text:"Lower highs and lower lows remain intact. A rally into resistance may offer a short, but only with defined risk.",bias:"short",pts:[80,78,76,77,74,72,73,70,69,71,72,70,68,66,67,65],entry:70,stop:73,target:64},
+  {name:"Trend pullback",text:"Higher highs and higher lows are intact. Price pulled back near support and buyers are returning.",bias:"long",pts:[25,27,28,30,29,31,33,34,33,32,33,35,36,38,37,39],entry:35,stop:32,target:41}
+];
+function newScenario(){
+  simScenario = scenarios[Math.floor(Math.random()*scenarios.length)];
+  el("scenarioText").textContent = simScenario.name + ": " + simScenario.text;
+  el("entryInput").value = simScenario.entry;
+  el("stopInput").value = simScenario.stop;
+  el("targetInput").value = simScenario.target;
+  el("simFeedback").className="feedback";
+  el("simFeedback").textContent="Use the chart to plan entry, stop, target, and risk before choosing an action.";
+  drawChart(simScenario.pts);
+}
+function drawChart(pts){
+  const svg=el("simChart"), w=620,h=260,pad=24,min=Math.min(...pts),max=Math.max(...pts),r=max-min||1;
+  const coords=pts.map((p,i)=>[pad+i*(w-pad*2)/(pts.length-1), h-pad-(p-min)/r*(h-pad*2)]);
+  const d=coords.map((c,i)=>(i?"L":"M")+c[0].toFixed(1)+" "+c[1].toFixed(1)).join(" ");
+  const last=coords[coords.length-1];
+  svg.innerHTML = `<defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#f4b942"/><stop offset="1" stop-color="#39d98a"/></linearGradient></defs>
+    <rect x="0" y="0" width="${w}" height="${h}" fill="#0b100d"/>
+    ${[0,1,2,3].map(i=>`<line x1="${pad}" x2="${w-pad}" y1="${pad+i*(h-pad*2)/3}" y2="${pad+i*(h-pad*2)/3}" stroke="#233029"/>`).join("")}
+    <path d="${d}" fill="none" stroke="url(#g)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${last[0]}" cy="${last[1]}" r="5" fill="#f4b942"/>
+    <text x="${pad}" y="22" fill="#9aa79d" font-size="13">Simulated chart, not live data</text>`;
+}
+function takeTrade(action){
+  const e=+el("entryInput").value, s=+el("stopInput").value, t=+el("targetInput").value, risk=+el("riskInput").value||100;
+  let msg="", cls="feedback ", good=false;
+  if(action==="skip"){
+    good = simScenario.bias==="skip"; msg = good ? "Good skip. No clean edge is a valid decision." : "Skipping protects capital, but this scenario had a tradable bias if risk was defined.";
+  } else {
+    const perShare = action==="long" ? e-s : s-e;
+    const reward = action==="long" ? t-e : e-t;
+    const rr = perShare>0 ? reward/perShare : -1;
+    const size = perShare>0 ? Math.floor(risk/perShare) : 0;
+    good = action===simScenario.bias && rr>=1.5 && perShare>0;
+    msg = good ? `Process win. Direction matched, risk/share ${perShare.toFixed(2)}, reward/risk ${rr.toFixed(2)}R, suggested size ${size} shares for $${risk} risk.` : `Review needed. Direction, stop placement, or reward/risk is weak. Risk/share ${perShare.toFixed(2)}, reward/risk ${rr.toFixed(2)}R.`;
+  }
+  cls += good ? "good" : "bad";
+  el("simFeedback").className=cls; el("simFeedback").textContent=msg;
+  state.trades.unshift({level:current+1,scenario:simScenario.name,action,ok:good,date:new Date().toLocaleString()});
+  state.trades = state.trades.slice(0,50);
+  saveState(); renderLedger(); newScenario();
+}
+function renderLedger(){
+  el("ledger").innerHTML = state.trades.length ? state.trades.map(t=>`<div class="ledgerRow"><b>${esc(t.ok?"Process win":"Review")}</b> L${t.level} ${esc(t.scenario)}: ${esc(t.action)}<br><span class="mini">${esc(t.date)}</span></div>`).join("") : `<p class="mini">No paper trades yet.</p>`;
+}
+function renderReport(){
+  const scores = Object.entries(state.scores).map(([i,s])=>`<tr><td>Level ${+i+1}</td><td>${levels[i].t}</td><td>${s}%</td></tr>`).join("");
+  const weak = Object.entries(state.weak||{}).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`<span class="chip">${esc(k)}: ${v}</span>`).join("") || `<span class="chip">None yet</span>`;
+  const wins = state.trades.filter(t=>t.ok).length, total=state.trades.length;
+  el("report").innerHTML = `<p><b>Completed lessons:</b> ${Object.keys(state.scores).length} of ${levels.length}. <b>Simulator process wins:</b> ${wins} of ${total}.</p>
+  <p><b>Topics needing review:</b></p><div class="chips">${weak}</div>
+  <h3>Quiz Scores</h3><table><thead><tr><th>Level</th><th>Topic</th><th>Score</th></tr></thead><tbody>${scores || `<tr><td colspan="3">No graded quizzes yet.</td></tr>`}</tbody></table>`;
+  renderLedger();
+}
+
+document.getElementById("buyPressure").onclick=()=>nudge(1);
+document.getElementById("sellPressure").onclick=()=>nudge(-1);
+document.getElementById("toyReset").onclick=()=>{toy={price:50,history:[50,50.15,50.05,50.22,50.18]}; el("toyPrice").textContent="50.00"; renderTape();};
+document.getElementById("printBtn").onclick=()=>window.print();
+document.getElementById("resetBtn").onclick=()=>{ if(confirm("Reset all local progress for this course?")){ localStorage.removeItem(STORAGE_KEY); location.reload(); } };
+document.getElementById("saveNotes").onclick=()=>{ state.notes[current]=el("assignmentNotes").value; saveState(); el("notesSaved").classList.remove("hide"); setTimeout(()=>el("notesSaved").classList.add("hide"),1300); };
+document.getElementById("explainBtn").onclick=()=>renderTutor("steps");
+document.querySelectorAll(".tutor").forEach(b=>b.onclick=()=>renderTutor(b.dataset.style));
+document.getElementById("newScenario").onclick=newScenario;
+document.getElementById("takeLong").onclick=()=>takeTrade("long");
+document.getElementById("takeShort").onclick=()=>takeTrade("short");
+document.getElementById("skipTrade").onclick=()=>takeTrade("skip");
+
+renderTape();
+renderLevel();
+</script>
+</body>
+</html>
